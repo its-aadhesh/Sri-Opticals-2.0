@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useStore } from "@/components/store-provider";
 import {
+  collections,
   formatMoney,
   getMOQ,
   getProduct,
@@ -165,6 +166,15 @@ export function Catalog({
     return `/shop${params.size ? `?${params.toString()}` : ""}`;
   }
 
+  function hrefForClass(value: string) {
+    const params = new URLSearchParams();
+    if (audience !== "All") params.set("audience", audience);
+    if (query) params.set("q", query);
+    if (sort !== "featured") params.set("sort", sort);
+    if (value) params.set("collection", value);
+    return `/shop${params.size ? `?${params.toString()}` : ""}`;
+  }
+
   return (
     <>
       <div className="mode-banner" role="status">
@@ -180,8 +190,8 @@ export function Catalog({
         )}
       </div>
 
-      <nav className="category-tabs" aria-label="Shop by audience">
-        {["All", "Men", "Women", "Children"].map((item) => (
+      <nav className="category-tabs" aria-label="Shop by category">
+        {["All", "Men", "Women", "Children", "Shades", "Sportswear"].map((item) => (
           <Link
             href={hrefFor(item)}
             key={item}
@@ -192,6 +202,27 @@ export function Catalog({
           </Link>
         ))}
       </nav>
+
+      <div className="class-filter" aria-label="Filter by class">
+        <span className="class-filter-label">Class:</span>
+        <Link
+          href={hrefForClass("")}
+          className={!collection ? "active" : ""}
+          aria-current={!collection ? "page" : undefined}
+        >
+          All
+        </Link>
+        {collections.map((c) => (
+          <Link
+            key={c.key}
+            href={hrefForClass(c.key)}
+            className={collection === c.key ? "active" : ""}
+            aria-current={collection === c.key ? "page" : undefined}
+          >
+            {c.title}
+          </Link>
+        ))}
+      </div>
 
       <form action="/shop" method="get" className="catalog-controls">
         {audience !== "All" && <input type="hidden" name="audience" value={audience} />}
